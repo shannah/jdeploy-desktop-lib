@@ -139,7 +139,7 @@ public class JDeploySingletonWatcher {
      *
      * @param files the files to dispatch
      */
-    static void dispatchFiles(List<File> files) {
+    public static void dispatchFiles(List<File> files) {
         if (files == null || files.isEmpty()) {
             return;
         }
@@ -160,7 +160,7 @@ public class JDeploySingletonWatcher {
      *
      * @param uris the URIs to dispatch
      */
-    static void dispatchURIs(List<URI> uris) {
+    public static void dispatchURIs(List<URI> uris) {
         if (uris == null || uris.isEmpty()) {
             return;
         }
@@ -179,7 +179,7 @@ public class JDeploySingletonWatcher {
     /**
      * Dispatch activation event to the handler or queue it.
      */
-    static void dispatchActivate() {
+    public static void dispatchActivate() {
         JDeployOpenHandler h = handler;
         if (h != null) {
             try {
@@ -507,7 +507,7 @@ public class JDeploySingletonWatcher {
     /**
      * Shutdown the watcher. Primarily for testing.
      */
-    static synchronized void shutdown() {
+    public static synchronized void shutdown() {
         if (instance != null) {
             instance.running = false;
             if (instance.watcherThread != null) {
