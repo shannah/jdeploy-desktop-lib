@@ -16,4 +16,13 @@
     <name>jdeploy-desktop-lib-core</name>
     <description>Core module for jDeploy desktop applications. Pure Java with no GUI dependencies.</description>
 
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
 </project>
