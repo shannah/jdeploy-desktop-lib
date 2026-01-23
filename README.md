@@ -1,5 +1,9 @@
 # jdeploy-desktop-lib
 
+[![Maven Central](https://img.shields.io/maven-central/v/ca.weblite/jdeploy-desktop-lib-core)](https://central.sonatype.com/artifact/ca.weblite/jdeploy-desktop-lib-core)
+[![Java 11+](https://img.shields.io/badge/Java-11%2B-blue)](https://openjdk.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A Java library that enables singleton application behavior for jDeploy-packaged desktop applications. Handle file opens, URI scheme activations, and app reactivation events when users interact with your application.
 
 ## Overview
@@ -22,7 +26,7 @@ Choose the module that matches your UI toolkit:
 <dependency>
     <groupId>ca.weblite</groupId>
     <artifactId>jdeploy-desktop-lib-swing</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -32,7 +36,7 @@ Choose the module that matches your UI toolkit:
 <dependency>
     <groupId>ca.weblite</groupId>
     <artifactId>jdeploy-desktop-lib-javafx</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -44,7 +48,7 @@ If you need to handle threading yourself:
 <dependency>
     <groupId>ca.weblite</groupId>
     <artifactId>jdeploy-desktop-lib-core</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -462,7 +466,7 @@ mvn clean install
 
 ## Requirements
 
-- Java 8 or higher
+- Java 11 or higher
 - Maven 3.6+ (for building)
 
 ## License
