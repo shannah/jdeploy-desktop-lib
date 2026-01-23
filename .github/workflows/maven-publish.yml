@@ -1,12 +1,12 @@
-name: Maven Build and Publish
+name: Build and Deploy to Maven Central
 
 on:
   push:
     branches: [ main, master ]
+    tags:
+      - 'v*'  # e.g. v1.0.0
   pull_request:
     branches: [ main, master ]
-  release:
-    types: [ published ]
 
 jobs:
   build:
@@ -22,14 +22,20 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn -B clean verify
+        run: mvn -B clean verify --batch-mode -ntp
 
-  publish:
+  deploy:
     needs: build
-    if: github.event_name == 'release'
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Extract version from tag (v1.0.0 -> 1.0.0)
+      - name: Determine Release Version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Set up JDK 8
         uses: actions/setup-java@v4
@@ -38,20 +44,29 @@ jobs:
           distribution: 'temurin'
           cache: maven
           server-id: central
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
+          server-username: MAVEN_CENTRAL_USERNAME
+          server-password: MAVEN_CENTRAL_PASSWORD
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          overwrite-settings: true
 
-      - name: Import GPG key
+      - name: Set Maven project version
         run: |
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
-          gpg --list-secret-keys --keyid-format LONG
+          mvn versions:set \
+            -DnewVersion="${{ env.VERSION }}" \
+            -DprocessAllModules=true \
+            -DgenerateBackupPoms=false \
+            --batch-mode \
+            -ntp
 
-      - name: Update version for release
-        run: mvn -B versions:set -DnewVersion=${{ github.event.release.tag_name }} -DgenerateBackupPoms=false
-
-      - name: Publish to Maven Central
-        run: mvn -B clean deploy -Psign-artifacts
+      - name: Build and Deploy
+        run: mvn -B clean deploy --batch-mode -ntp -Psign-artifacts
         env:
-          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+
+      - name: Verify
+        if: always()
+        run: |
+          echo "Build completed. If successful, your artifacts should be staged and automatically released on Maven Central."
