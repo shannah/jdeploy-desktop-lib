@@ -13,8 +13,18 @@ import java.util.List;
 /**
  * Singleton support for Swing applications.
  *
- * <p>Ensures all callbacks happen on the Event Dispatch Thread.
- * On macOS, also hooks into the native Desktop API for file/URI handling.</p>
+ * <p>Ensures all callbacks happen on the Event Dispatch Thread.</p>
+ *
+ * <h2>Platform Behavior</h2>
+ * <ul>
+ *   <li><b>macOS:</b> Uses the native Desktop API ({@code Desktop.setOpenFileHandler()},
+ *       {@code Desktop.setOpenURIHandler()}). macOS handles single-instance behavior
+ *       natively, routing file/URI opens to the running instance automatically.
+ *       No file-based IPC is used.</li>
+ *   <li><b>Windows/Linux:</b> Uses file-based IPC via {@link JDeploySingletonWatcher}.
+ *       The jDeploy launcher detects an existing instance and writes request files
+ *       that this library monitors and dispatches to your handler.</li>
+ * </ul>
  *
  * <h2>Usage</h2>
  * <pre>
@@ -57,10 +67,10 @@ public class JDeploySwingApp {
     private static volatile JDeployOpenHandler userHandler;
 
     static {
-        // Initialize the singleton watcher
+        // Initialize file-based IPC watcher (no-op on macOS, active on Windows/Linux)
         JDeploySingletonWatcher.initialize();
 
-        // On macOS, also hook into native Desktop API
+        // On macOS, hook into native Desktop API for file/URI handling
         setupMacOSHandlers();
     }
 

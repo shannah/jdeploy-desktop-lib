@@ -13,6 +13,16 @@ import java.util.List;
  *
  * <p>Ensures all callbacks happen on the JavaFX Application Thread.</p>
  *
+ * <h2>Platform Behavior</h2>
+ * <ul>
+ *   <li><b>macOS:</b> macOS handles single-instance behavior natively. File/URI opens
+ *       are routed to the running instance automatically by the OS. On macOS, this class
+ *       relies on the AWT Desktop API (which works with JavaFX) to receive these events.</li>
+ *   <li><b>Windows/Linux:</b> Uses file-based IPC via {@link JDeploySingletonWatcher}.
+ *       The jDeploy launcher detects an existing instance and writes request files
+ *       that this library monitors and dispatches to your handler.</li>
+ * </ul>
+ *
  * <h2>Usage</h2>
  * <pre>
  * public class MyApp extends Application {
@@ -51,8 +61,59 @@ public class JDeployFXApp {
     private static volatile JDeployOpenHandler userHandler;
 
     static {
-        // Initialize the singleton watcher
+        // Initialize file-based IPC watcher (no-op on macOS, active on Windows/Linux)
         JDeploySingletonWatcher.initialize();
+
+        // On macOS, hook into native Desktop API for file/URI handling
+        setupMacOSHandlers();
+    }
+
+    private static void setupMacOSHandlers() {
+        if (!java.awt.Desktop.isDesktopSupported()) {
+            return;
+        }
+
+        java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+
+        // Try to set OpenFilesHandler (only supported on macOS)
+        try {
+            desktop.setOpenFileHandler(event -> {
+                java.util.List<File> files = event.getFiles();
+                if (files != null && !files.isEmpty()) {
+                    dispatchOnFXThread(() -> {
+                        JDeployOpenHandler h = userHandler;
+                        if (h != null) {
+                            h.openFiles(java.util.Collections.unmodifiableList(files));
+                        } else {
+                            // Queue for later dispatch via singleton watcher
+                            JDeploySingletonWatcher.dispatchFiles(files);
+                        }
+                    });
+                }
+            });
+        } catch (UnsupportedOperationException e) {
+            // Not on macOS, ignore
+        }
+
+        // Try to set OpenURIHandler (only supported on macOS)
+        try {
+            desktop.setOpenURIHandler(event -> {
+                java.net.URI uri = event.getURI();
+                if (uri != null) {
+                    dispatchOnFXThread(() -> {
+                        JDeployOpenHandler h = userHandler;
+                        if (h != null) {
+                            h.openURIs(java.util.Collections.singletonList(uri));
+                        } else {
+                            // Queue for later dispatch via singleton watcher
+                            JDeploySingletonWatcher.dispatchURIs(java.util.Collections.singletonList(uri));
+                        }
+                    });
+                }
+            });
+        } catch (UnsupportedOperationException e) {
+            // Not on macOS, ignore
+        }
     }
 
     /**

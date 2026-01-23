@@ -1,6 +1,7 @@
 package ca.weblite.jdeploy.app;
 
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -381,6 +382,10 @@ public class JDeploySingletonWatcherTest {
 
     @Test
     public void testIntegration_existingRequestFileProcessing() throws Exception {
+        // Skip on macOS - watcher is not used on macOS
+        Assume.assumeFalse("Skipping on macOS - watcher not used",
+                System.getProperty("os.name", "").toLowerCase().contains("mac"));
+
         // Create temporary IPC directory
         Path tempDir = Files.createTempDirectory("jdeploy-test");
         Path inboxDir = tempDir.resolve("inbox");
@@ -419,6 +424,10 @@ public class JDeploySingletonWatcherTest {
 
     @Test
     public void testIntegration_initialPropertiesProcessed() throws Exception {
+        // Skip on macOS - watcher is not used on macOS
+        Assume.assumeFalse("Skipping on macOS - watcher not used",
+                System.getProperty("os.name", "").toLowerCase().contains("mac"));
+
         // Create temporary IPC directory
         Path tempDir = Files.createTempDirectory("jdeploy-test");
         Files.createDirectories(tempDir.resolve("inbox"));

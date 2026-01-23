@@ -31,6 +31,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * ACTIVATE
  * </pre>
  *
+ * <p><b>Platform behavior:</b></p>
+ * <ul>
+ *   <li><b>macOS:</b> This watcher is not used. macOS handles single-instance behavior
+ *       natively, and the jDeploy launcher does not set up file-based IPC on macOS.
+ *       File/URI events are handled via the native Desktop API instead.</li>
+ *   <li><b>Windows/Linux:</b> The jDeploy launcher sets up an IPC directory and this
+ *       watcher monitors it for request files from secondary instances.</li>
+ * </ul>
+ *
  * <p>This class is automatically initialized by the Swing and JavaFX modules. Applications
  * should not need to interact with it directly.</p>
  *
@@ -68,12 +77,23 @@ public class JDeploySingletonWatcher {
      * Initialize the singleton watcher. Called automatically by
      * JDeploySwingApp or JDeployFXApp static initializers.
      *
-     * <p>Reads the {@code jdeploy.singleton.ipcdir} system property to determine
-     * the IPC directory. If not set, singleton mode is disabled and this method
-     * returns without doing anything.</p>
+     * <p>On macOS, this method returns immediately without initializing the watcher.
+     * macOS handles single-instance behavior natively via the Desktop API, and the
+     * jDeploy launcher does not set up file-based IPC on macOS.</p>
+     *
+     * <p>On Windows and Linux, reads the {@code jdeploy.singleton.ipcdir} system property
+     * to determine the IPC directory. If not set, singleton mode is disabled and this
+     * method returns without doing anything.</p>
      */
     public static synchronized void initialize() {
         if (instance != null) {
+            return;
+        }
+
+        // macOS handles single-instance behavior natively via Desktop API.
+        // The jDeploy launcher doesn't set up file-based IPC on macOS.
+        String osName = System.getProperty("os.name", "").toLowerCase();
+        if (osName.contains("mac")) {
             return;
         }
 

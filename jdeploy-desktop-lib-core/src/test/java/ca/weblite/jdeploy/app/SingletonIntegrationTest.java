@@ -4,6 +4,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
@@ -22,8 +24,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Integration tests for the singleton watcher functionality.
+ *
+ * <p>These tests are disabled on macOS because the singleton watcher
+ * is not used on macOS (macOS handles single-instance behavior natively).</p>
  */
 @Timeout(10)
+@DisabledOnOs(OS.MAC)
 class SingletonIntegrationTest {
 
     @TempDir
