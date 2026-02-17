@@ -23,10 +23,22 @@ import java.util.List;
  *       that this library monitors and dispatches to your handler.</li>
  * </ul>
  *
+ * <h2>Important: Initialization Order on macOS</h2>
+ * <p>On macOS, the AWT Desktop handlers must be registered <b>before</b> JavaFX starts.
+ * You must call {@link #initialize()} in your {@code main()} method before calling
+ * {@code Application.launch()}. Failure to do so will result in deep links and file
+ * associations not working on macOS.</p>
+ *
  * <h2>Usage</h2>
  * <pre>
  * public class MyApp extends Application {
  *     private Stage primaryStage;
+ *
+ *     public static void main(String[] args) {
+ *         // REQUIRED: Initialize before launching JavaFX
+ *         JDeployFXApp.initialize();
+ *         launch(args);
+ *     }
  *
  *     &#64;Override
  *     public void start(Stage stage) {
@@ -68,6 +80,33 @@ public class JDeployFXApp {
         setupMacOSHandlers();
     }
 
+    /**
+     * Initialize JDeployFXApp before launching JavaFX.
+     *
+     * <p><b>IMPORTANT:</b> On macOS, this method MUST be called in your {@code main()}
+     * method BEFORE calling {@code Application.launch()}. This ensures the AWT Desktop
+     * handlers are registered while AWT is still the primary toolkit. If JavaFX starts
+     * first, deep links and file associations will not work on macOS.</p>
+     *
+     * <p>On Windows and Linux, calling this method is optional but recommended for
+     * consistency.</p>
+     *
+     * <h3>Example:</h3>
+     * <pre>
+     * public static void main(String[] args) {
+     *     JDeployFXApp.initialize();  // Must be before launch()
+     *     launch(args);
+     * }
+     * </pre>
+     *
+     * @since 1.0.1
+     */
+    public static void initialize() {
+        // This method's purpose is to force the static initializer to run.
+        // The actual initialization happens in the static block above.
+        // This is a no-op, but calling it ensures the class is fully initialized.
+    }
+
     private static void setupMacOSHandlers() {
         if (!java.awt.Desktop.isDesktopSupported()) {
             return;
@@ -92,7 +131,7 @@ public class JDeployFXApp {
                 }
             });
         } catch (UnsupportedOperationException e) {
-            // Not on macOS, ignore
+            // OpenFileHandler not supported on this platform
         }
 
         // Try to set OpenURIHandler (only supported on macOS)
@@ -112,7 +151,7 @@ public class JDeployFXApp {
                 }
             });
         } catch (UnsupportedOperationException e) {
-            // Not on macOS, ignore
+            // OpenURIHandler not supported on this platform
         }
     }
 
