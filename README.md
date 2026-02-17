@@ -26,7 +26,7 @@ Choose the module that matches your UI toolkit:
 <dependency>
     <groupId>ca.weblite</groupId>
     <artifactId>jdeploy-desktop-lib-swing</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 </dependency>
 ```
 
@@ -36,7 +36,7 @@ Choose the module that matches your UI toolkit:
 <dependency>
     <groupId>ca.weblite</groupId>
     <artifactId>jdeploy-desktop-lib-javafx</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 </dependency>
 ```
 
@@ -48,7 +48,7 @@ If you need to handle threading yourself:
 <dependency>
     <groupId>ca.weblite</groupId>
     <artifactId>jdeploy-desktop-lib-core</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 </dependency>
 ```
 
@@ -86,6 +86,11 @@ import ca.weblite.jdeploy.app.JDeployOpenHandler;
 import ca.weblite.jdeploy.app.javafx.JDeployFXApp;
 
 public class MyApp extends Application {
+    public static void main(String[] args) {
+        JDeployFXApp.initialize(); // Required for macOS deep link support
+        launch(args);
+    }
+
     @Override
     public void start(Stage stage) {
         JDeployFXApp.setOpenHandler(new JDeployOpenHandler() {
@@ -211,6 +216,7 @@ public class MyJavaFXApp extends Application {
     private TextArea logArea;
 
     public static void main(String[] args) {
+        JDeployFXApp.initialize(); // Required for macOS deep link support
         launch(args);
     }
 
