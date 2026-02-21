@@ -9,6 +9,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -57,6 +60,7 @@ public class FileWatcherHiveDriver implements HiveDriver {
     private final Path messageDir;
     private final String instanceId;
     private final CopyOnWriteArrayList<HiveMessageListener> listeners = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<String> queuedMessages = new CopyOnWriteArrayList<>();
 
     private volatile boolean running;
     private volatile boolean enabled;
@@ -184,6 +188,22 @@ public class FileWatcherHiveDriver implements HiveDriver {
     public void addMessageListener(HiveMessageListener listener) {
         if (listener != null) {
             listeners.add(listener);
+            // Dispatch any queued messages to the new listener
+            dispatchQueuedMessages();
+        }
+    }
+
+    /**
+     * Dispatch any messages that were queued before listeners were added.
+     */
+    private void dispatchQueuedMessages() {
+        if (listeners.isEmpty() || queuedMessages.isEmpty()) {
+            return;
+        }
+        List<String> toDispatch = new ArrayList<>(queuedMessages);
+        queuedMessages.clear();
+        for (String message : toDispatch) {
+            dispatchMessage(message);
         }
     }
 
@@ -217,6 +237,7 @@ public class FileWatcherHiveDriver implements HiveDriver {
         }
 
         listeners.clear();
+        queuedMessages.clear();
     }
 
     @Override
@@ -312,12 +333,13 @@ public class FileWatcherHiveDriver implements HiveDriver {
 
     /**
      * Process any existing message files (for startup race conditions).
+     * Messages are sorted by filename which starts with timestamp for ordering.
      */
     private void processExistingMessages() {
         try {
             Files.list(messageDir)
                     .filter(p -> p.toString().endsWith(MESSAGE_EXTENSION))
-                    .sorted()
+                    .sorted(Comparator.comparing(p -> p.getFileName().toString()))
                     .forEach(this::processMessageFile);
         } catch (IOException e) {
             // Ignore
@@ -349,9 +371,13 @@ public class FileWatcherHiveDriver implements HiveDriver {
     }
 
     /**
-     * Dispatch a message to all listeners.
+     * Dispatch a message to all listeners, or queue if none registered.
      */
     private void dispatchMessage(String message) {
+        if (listeners.isEmpty()) {
+            queuedMessages.add(message);
+            return;
+        }
         for (HiveMessageListener listener : listeners) {
             try {
                 listener.onMessage(message);
