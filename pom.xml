@@ -47,6 +47,8 @@
         <module>jdeploy-desktop-lib-core</module>
         <module>jdeploy-desktop-lib-swing</module>
         <module>jdeploy-desktop-lib-javafx</module>
+        <module>jdeploy-desktop-lib-hive</module>
+        <module>jdeploy-desktop-lib-hive-filewatcher</module>
     </modules>
 
     <profiles>
