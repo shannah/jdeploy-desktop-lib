@@ -44,11 +44,13 @@
     </developers>
 
     <modules>
+        <module>jdeploy-desktop-lib-bom</module>
         <module>jdeploy-desktop-lib-core</module>
         <module>jdeploy-desktop-lib-swing</module>
         <module>jdeploy-desktop-lib-javafx</module>
         <module>jdeploy-desktop-lib-hive</module>
         <module>jdeploy-desktop-lib-hive-filewatcher</module>
+        <module>jdeploy-desktop-lib-bridge</module>
     </modules>
 
     <profiles>

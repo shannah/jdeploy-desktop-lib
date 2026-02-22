@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>ca.weblite</groupId>
+        <artifactId>jdeploy-desktop-lib</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>jdeploy-desktop-lib-bom</artifactId>
+    <packaging>pom</packaging>
+    <name>jdeploy-desktop-lib-bom</name>
+    <description>Bill of Materials (BOM) for jDeploy Desktop Library. Import this POM to manage versions of all jdeploy-desktop-lib modules.</description>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Core module - base utilities -->
+            <dependency>
+                <groupId>ca.weblite</groupId>
+                <artifactId>jdeploy-desktop-lib-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Swing integration -->
+            <dependency>
+                <groupId>ca.weblite</groupId>
+                <artifactId>jdeploy-desktop-lib-swing</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- JavaFX integration -->
+            <dependency>
+                <groupId>ca.weblite</groupId>
+                <artifactId>jdeploy-desktop-lib-javafx</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Hive IPC - core interfaces -->
+            <dependency>
+                <groupId>ca.weblite</groupId>
+                <artifactId>jdeploy-desktop-lib-hive</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Hive IPC - file watcher implementation -->
+            <dependency>
+                <groupId>ca.weblite</groupId>
+                <artifactId>jdeploy-desktop-lib-hive-filewatcher</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- GUI Bridge - CLI to GUI communication -->
+            <dependency>
+                <groupId>ca.weblite</groupId>
+                <artifactId>jdeploy-desktop-lib-bridge</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>
