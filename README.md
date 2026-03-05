@@ -26,7 +26,7 @@ Choose the module that matches your UI toolkit:
 <dependency>
     <groupId>ca.weblite</groupId>
     <artifactId>jdeploy-desktop-lib-swing</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
 </dependency>
 ```
 
@@ -36,7 +36,7 @@ Choose the module that matches your UI toolkit:
 <dependency>
     <groupId>ca.weblite</groupId>
     <artifactId>jdeploy-desktop-lib-javafx</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
 </dependency>
 ```
 
@@ -48,7 +48,7 @@ If you need to handle threading yourself:
 <dependency>
     <groupId>ca.weblite</groupId>
     <artifactId>jdeploy-desktop-lib-core</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
 </dependency>
 ```
 
