@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -243,7 +244,7 @@ class HiveIntegrationTest {
         List<String> instanceIds = pongs.stream()
                 .map(HivePong::getInstanceId)
                 .sorted()
-                .toList();
+                .collect(Collectors.toList());
         assertEquals(List.of("worker-1", "worker-2"), instanceIds);
     }
 
